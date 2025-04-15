@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Card } from 'react-bootstrap'
+import { Spinner } from 'react-bootstrap'
+import SingleBook from './SingleBook'
+import BookObject from '../types'
 
 const FetchBooks = function () {
-  const [books, setBooks] = useState([])
+  const [books, setBooks] = useState<BookObject[] | null>(null)
   //   books è un array di oggetti (libri)
+  const [isLoading, setIsLoading] = useState(true)
 
   const getBooks = () => {
     const booksURL = 'https://striveschool-api.herokuapp.com/food-books'
@@ -18,6 +21,8 @@ const FetchBooks = function () {
       .then((arrayOfBooks) => {
         console.log('BOOKS', arrayOfBooks)
         setBooks(arrayOfBooks)
+        // i libri sono stati salvati nello stato!
+        setIsLoading(false)
       })
       .catch((err) => {
         console.log(err)
@@ -33,16 +38,16 @@ const FetchBooks = function () {
   return (
     <div>
       <h2>Benvenuto nella mia libreria!</h2>
-      <Card>
-        <Card.Img variant="top" src="holder.js/100px180" />
-        <Card.Body>
-          <Card.Title>{books[0].description}</Card.Title>
-          <Card.Text>
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </Card.Text>
-        </Card.Body>
-      </Card>
+      {isLoading ? (
+        <div>
+          <Spinner animation="border" variant="success" />
+        </div>
+      ) : (
+        // non-null assertion operator
+        books!.map((b) => {
+          return <SingleBook book={b} key={b.id} />
+        })
+      )}
     </div>
   )
 }
